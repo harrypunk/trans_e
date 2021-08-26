@@ -61,11 +61,12 @@ class TransE(nn.Module):
 
 
     def _calc(self, h, t, r):
-        # TO DO: implement score function
-        # Hint: you can use F.normalize and torch.norm functions
-        if self.norm_flag: # normalize embeddings with l2 norm
+        if self.norm_flag:
+            h = F.normalize(h)
+            t = F.normalize(t)
+            r = F.normalize(r)
             
-        pass
+        return abs(h + r - t)
 
     def forward(self, data):
         batch_h = data['batch_h']
@@ -82,9 +83,7 @@ class TransE(nn.Module):
         return score.cpu().data.numpy()
     
     def loss(self, pos_score, neg_score):
-        # TO DO: implement loss function
-        # Hint: consider margin
-        pass
+        return pos_score + neg_score
         
 
 
@@ -93,7 +92,7 @@ def main():
     train_dataloader = PyTorchTrainDataLoader(
                             in_path = "./data/", 
                             nbatches = config.nbatches,
-                            threads = 8)
+                            threads = 16)
     
     transe = TransE(
             ent_tot = train_dataloader.get_ent_tot(),
